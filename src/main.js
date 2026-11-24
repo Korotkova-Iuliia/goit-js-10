@@ -10,37 +10,34 @@ formEl.addEventListener('submit', event => {
   event.preventDefault();
 
   const formData = new FormData(event.currentTarget);
+
   drinkName = formData.get('drink');
-  shouldResolve = formData.get('state');
+  shouldResolve = formData.get('state') === 'fulfilled';
   delay = PREP_TIME[drinkName];
+
   let row = addOrderRow(drinkName);
 
-  console.log(row);
   makeOrder(delay, shouldResolve)
     .then(coffeDoneTime => {
-      console.log(`✅ ${drinkName} готове · ${coffeDoneTime}ms · `);
       row.classList.replace('row-pending', 'row-ok');
       row.textContent = `✅ ${drinkName} готове · ${coffeDoneTime}ms · `;
     })
     .catch(coffeCancelTime => {
-      console.log(`❌  ${drinkName} · скасоване ${coffeCancelTime}ms · `);
       row.classList.replace('row-pending', 'row-err');
       row.textContent = `❌  ${drinkName} · скасоване ${coffeCancelTime}ms · `;
     })
     .finally(() => {
       let date = new Date().toLocaleTimeString('uk-UA');
-      row.insertAdjacentHTML('beforeend', date);
+      //   row.insertAdjacentHTML('beforeend', date);
+      row.append(` · ${date}`);
     });
 });
 function makeOrder(delay, shouldResolve) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (shouldResolve === 'fulfilled') {
-        console.log(shouldResolve);
-
+      if (shouldResolve) {
         resolve(delay);
       } else {
-        console.log(shouldResolve);
         reject(delay);
       }
     }, delay);
