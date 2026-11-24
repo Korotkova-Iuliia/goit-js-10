@@ -2,20 +2,14 @@ import { PREP_TIME } from './js/menu.js';
 
 const formEl = document.querySelector('.form');
 const orderLog = document.querySelector('.order-log');
-let drinkName = '';
-let shouldResolve;
-let delay;
 
 formEl.addEventListener('submit', event => {
   event.preventDefault();
-
   const formData = new FormData(event.currentTarget);
-
-  drinkName = formData.get('drink');
-  shouldResolve = formData.get('state') === 'fulfilled';
-  delay = PREP_TIME[drinkName];
-
-  let row = addOrderRow(drinkName);
+  const drinkName = formData.get('drink');
+  const shouldResolve = formData.get('state') === 'fulfilled';
+  const delay = PREP_TIME[drinkName] ?? 1000;
+  const row = addOrderRow(drinkName);
 
   makeOrder(delay, shouldResolve)
     .then(coffeDoneTime => {
