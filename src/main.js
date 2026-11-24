@@ -3,52 +3,52 @@ import { PREP_TIME } from './js/menu.js';
 const formEl = document.querySelector('.form');
 const orderLog = document.querySelector('.order-log');
 let drinkName = '';
-let shouldResolve = '';
+let shouldResolve;
 let delay;
 
 formEl.addEventListener('submit', event => {
   event.preventDefault();
+
   const formData = new FormData(event.currentTarget);
   drinkName = formData.get('drink');
   shouldResolve = formData.get('state');
   delay = PREP_TIME[drinkName];
-  //   console.log(event.target.value);
-  //   const drink = formEl.elements.drink.value;
-  //   const Resolve = formEl.elements.state;
-  //   console.log(Resolve);
-  console.log(drinkName);
-  console.log(shouldResolve);
-  console.log(delay);
-
+  let row = addOrderRow(drinkName);
+  console.log(row);
   makeOrder(delay, shouldResolve)
-    .then(resultDrink => {
-      console.log(resultDrink);
-      //   orderLog.textContent = resultDrink;
+    .then(coffeDoneTime => {
+      console.log(`✅ ${drinkName} готове · ${coffeDoneTime}ms · `);
+      row.classList.replace('row-pending', 'row-ok');
+      row.textContent = `✅ ${drinkName} готове · ${coffeDoneTime}ms · `;
     })
-    .catch(cancelDrink => {
-      console.log(cancelDrink);
-      //   orderLog.textContent = `Cancel ${cancelDrink}`;
+    .catch(coffeCancelTime => {
+      console.log(`❌  ${drinkName} · скасоване ${coffeCancelTime}ms ·`);
+      row.classList.replace('row-pending', 'row-err');
+      row.textContent = `❌  ${drinkName} · скасоване ${coffeCancelTime}ms ·`;
     })
-    .finally(() => console.log(delay));
+    .finally(() => {
+      delay;
+    });
 });
 function makeOrder(delay, shouldResolve) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (shouldResolve === 'fulfilled') {
         console.log(shouldResolve);
-        console.log(`'заказ принят' ${delay}`);
+
         resolve(delay);
       } else {
         console.log(shouldResolve);
-        console.log(`'заказ отклонен' ${delay}`);
         reject(delay);
       }
     }, delay);
   });
 }
 function addOrderRow(drinkName) {
-  //     створює елемент <li>;
-  // дає йому клас row-pending і текст «у роботі…», наприклад ⏳ Капучино · у роботі…;
-  // додає його в список журналу (той, що ти зберіг у змінну);
-  // повертає цей елемент — бо його оновиш пізніше.
+  const newItem = document.createElement('li');
+  newItem.textContent = `⏳ ${drinkName} · у роботі…`;
+
+  newItem.classList.add('row-pending');
+  orderLog.append(newItem);
+  return newItem;
 }
