@@ -1,19 +1,20 @@
-import { PREP_TIME } from './menu';
+import { PREP_TIME } from './js/menu.js';
 
 const formEl = document.querySelector('.form');
 const orderLog = document.querySelector('.order-log');
 
-function makeOrder(delay, shouldResolve) {
+function makeOrder(waitTime, shouldResolve) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (shouldResolve) {
-        resolve(delay);
+        resolve(waitTime);
       } else {
-        reject(delay);
+        reject(waitTime);
       }
-    }, delay);
+    }, waitTime);
   });
 }
+
 function addOrderRow(drinkName) {
   const newItem = document.createElement('li');
   newItem.classList.add('row-pending');
@@ -23,7 +24,7 @@ function addOrderRow(drinkName) {
   return newItem;
 }
 
-function updateOrderRow(row, { status, drinkName, delay }) {
+function updateOrderRow(row, status, drinkName, finishedDelay) {
   const finishedAt = new Date().toLocaleTimeString('uk-UA');
   const isSuccess = status === 'ok';
 
@@ -33,7 +34,7 @@ function updateOrderRow(row, { status, drinkName, delay }) {
   const icon = isSuccess ? '✅' : '❌';
   const label = isSuccess ? 'готове' : 'скасовано';
 
-  row.textContent = `${icon} ${drinkName} · ${label} · ${delay} ms · ${finishedAt}`;
+  row.textContent = `${icon} ${drinkName} · ${label} · ${finishedDelay} ms · ${finishedAt}`;
 }
 
 formEl.addEventListener('submit', event => {
@@ -47,10 +48,10 @@ formEl.addEventListener('submit', event => {
   const row = addOrderRow(drinkName);
 
   makeOrder(delay, shouldResolve)
-    .then(time => {
-      updateOrderRow(row, { status: 'ok', drinkName, delay: time });
+    .then(finishedDelay => {
+      updateOrderRow(row, 'ok', drinkName, finishedDelay);
     })
-    .catch(time => {
-      updateOrderRow(row, { status: 'err', drinkName, delay: time });
+    .catch(finishedDelay => {
+      updateOrderRow(row, 'err', drinkName, finishedDelay);
     });
 });
